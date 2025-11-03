@@ -1,6 +1,8 @@
 package com.barbershop.api.transport.http.handlers;
 
 import com.barbershop.api.service.exceptions.BarberoNoEncontradoException;
+import com.barbershop.api.service.exceptions.ProductoNoEncontradoException;
+import com.barbershop.api.service.exceptions.ProductoYaExisteException;
 import com.barbershop.api.service.exceptions.UsuarioNoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BarberoNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleBarberoNoEncontrado(final BarberoNoEncontradoException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Maneja excepciones cuando no se encuentra un producto.
+     */
+    @ExceptionHandler(ProductoNoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> handleProductoNoEncontrado(final ProductoNoEncontradoException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Maneja excepciones cuando ya existe un producto con el mismo nombre.
+     */
+    @ExceptionHandler(ProductoYaExisteException.class)
+    public ResponseEntity<Map<String, Object>> handleProductoYaExiste(final ProductoYaExisteException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Maneja argumentos inválidos.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(final IllegalArgumentException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     /**

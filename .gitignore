@@ -34,3 +34,26 @@ build/
 
 ### Environment Variables ###
 .env
+.env.local
+.env.*.local
+
+### Logs ###
+*.log
+logs/
+
+### OS ###
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### Backup files ###
+*.bak
+*.swp
+*.tmp
+*~
+
+### Maven wrapper (opcional - ya está en el repo) ###
+# .mvn/
+
+### Scripts temporales ###
+kill-port-*.ps1
