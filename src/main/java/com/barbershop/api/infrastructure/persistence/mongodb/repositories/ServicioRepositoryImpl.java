@@ -1,9 +1,10 @@
 package com.barbershop.api.infrastructure.persistence.mongodb.repositories;
 
 import org.springframework.stereotype.Repository;
+
 import com.barbershop.api.domain.entities.Servicio;
 import com.barbershop.api.domain.repositories.ServicioRepository;
-import com.barbershop.api.infrastructure.persistence.mongodb.documents.ServicioDocument;
+import com.barbershop.api.infrastructure.persistence.mongodb.mappers.ServicioMapper;
 import com.barbershop.api.infrastructure.persistence.spring.ServicioSpringRepository;
 
 import java.util.List;
@@ -12,51 +13,36 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ServicioRepositoryImpl implements ServicioRepository {
-    
+
     private final ServicioSpringRepository springRepository;
-    
-    public ServicioRepositoryImpl(ServicioSpringRepository springRepository) {
+    private final ServicioMapper mapper;
+
+    public ServicioRepositoryImpl(final ServicioSpringRepository springRepository, final ServicioMapper mapper) {
         this.springRepository = springRepository;
+        this.mapper = mapper;
     }
-    
-    @Override
-    public Optional<Servicio> findById(String id) {
-        return springRepository.findById(id)
-                .map(this::toDomain);
-    }
-    
+
     @Override
     public List<Servicio> findAll() {
-        return springRepository.findAll()
-                .stream()
-                .map(this::toDomain)
+        return springRepository.findAll().stream()
+                .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
-    public Servicio save(Servicio servicio) {
-        ServicioDocument document = toDocument(servicio);
-        ServicioDocument saved = springRepository.save(document);
-        return toDomain(saved);
+    public Optional<Servicio> findById(final String id) {
+        return springRepository.findById(id).map(mapper::toDomain);
     }
-    
-    private ServicioDocument toDocument(Servicio servicio) {
-        return new ServicioDocument(
-            servicio.getId(),
-            servicio.getNombre(),
-            servicio.getDescripcion(),
-            servicio.getPrecioBase(),
-            servicio.getDuracionEstimada()
-        );
+
+    @Override
+    public Servicio save(final Servicio servicio) {
+        final var document = mapper.toDocument(servicio);
+        final var saved = springRepository.save(document);
+        return mapper.toDomain(saved);
     }
-    
-    private Servicio toDomain(ServicioDocument document) {
-        return new Servicio(
-            document.getId(),
-            document.getNombre(),
-            document.getDescripcion(),
-            document.getPrecioBase(),
-            document.getDuracionEstimada()
-        );
+
+    @Override
+    public void deleteById(final String id) {
+        springRepository.deleteById(id);
     }
 }

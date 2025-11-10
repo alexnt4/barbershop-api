@@ -1,7 +1,10 @@
 package com.barbershop.api.infrastructure.persistence.mongodb.documents;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +18,7 @@ public class ServicioDocument {
     private String id;
     private String nombre;
     private String descripcion;
-    private double precioBase;
-    private int duracionEstimada;
+    private int duracionMinutos;
+    private double precio;
+    private List<String> barberosIds;
 }
