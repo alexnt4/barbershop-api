@@ -5,6 +5,7 @@ import com.barbershop.api.domain.repositories.ProductoRepository;
 import com.barbershop.api.service.dtos.ProductoRegisterDTO;
 import com.barbershop.api.service.dtos.ProductoResponseDTO;
 import com.barbershop.api.service.exceptions.ProductoYaExisteException;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,12 +30,14 @@ public class ProductoRegistroInteractor {
 
     /**
      * Registra un nuevo producto en el sistema.
+     * Invalida el caché de productos y reportes.
      *
      * @param dto DTO con los datos del producto.
      * @return DTO de respuesta con el producto registrado.
      * @throws ProductoYaExisteException si ya existe un producto
      *                                   con el mismo nombre.
      */
+    @CacheEvict(value = { "productos", "reporteInventario" }, allEntries = true)
     public ProductoResponseDTO execute(final ProductoRegisterDTO dto) {
         // Validar que no exista un producto con el mismo nombre
         if (productoRepository.existsByNombre(dto.getNombre())) {
