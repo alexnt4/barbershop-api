@@ -3,6 +3,7 @@ package com.barbershop.api.service.interactors;
 import com.barbershop.api.domain.entities.Producto;
 import com.barbershop.api.domain.repositories.ProductoRepository;
 import com.barbershop.api.service.dtos.ProductoResponseDTO;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,9 +30,11 @@ public class ObtenerProductosInteractor {
 
     /**
      * Obtiene todos los productos del inventario.
+     * Este método cachea el resultado en Redis por 5 minutos.
      *
      * @return Lista de DTOs de productos.
      */
+    @Cacheable(value = "productos", key = "'lista-completa'")
     public List<ProductoResponseDTO> execute() {
         List<Producto> productos = productoRepository.findAll();
 

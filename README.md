@@ -21,7 +21,10 @@ API REST para gestión de una barbería desarrollada con Spring Boot siguiendo l
 - 🔐 **Autenticación JWT** - Sistema de autenticación seguro con tokens JWT
 - 👥 **Gestión de Usuarios** - CRUD completo para usuarios con diferentes roles
 - 💇 **Gestión de Barberos** - Sistema especializado para barberos con ratings y disponibilidad
-- 🔒 **Control de Acceso Basado en Roles** - Tres roles: CLIENTE, BARBERO, ADMINISTRADOR
+- � **Gestión de Inventario** - Control completo de productos con entradas/salidas automáticas
+- 📊 **Reportes de Inventario** - Estadísticas y análisis del stock actual
+- 🔴 **Caché con Redis** - Optimización de rendimiento en consultas frecuentes
+- �🔒 **Control de Acceso Basado en Roles** - Tres roles: CLIENTE, BARBERO, ADMINISTRADOR
 - 📚 **Documentación Swagger** - API completamente documentada con OpenAPI 3.0
 - 🗄️ **MongoDB** - Base de datos NoSQL para almacenamiento flexible
 - 🏗️ **Clean Architecture** - Código mantenible y testeable
@@ -32,8 +35,11 @@ API REST para gestión de una barbería desarrollada con Spring Boot siguiendo l
 - **Spring Boot 3.5.7**
   - Spring Security
   - Spring Data MongoDB
+  - Spring Data Redis
+  - Spring Cache
   - Spring Web
 - **MongoDB Atlas**
+- **Redis** - Caché en memoria
 - **JWT (jjwt 0.12.6)**
 - **Lombok**
 - **Swagger/OpenAPI 3**
@@ -44,6 +50,7 @@ API REST para gestión de una barbería desarrollada con Spring Boot siguiendo l
 - Java 21 o superior
 - Maven 3.6+
 - Cuenta en MongoDB Atlas (o MongoDB local)
+- Redis (Docker recomendado)
 - Git (opcional)
 
 ## 🚀 Instalación
@@ -69,6 +76,11 @@ cd barbershop-api
 # MongoDB Configuration
 MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/barbershop
 
+# Redis Configuration
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
 # JWT Configuration
 JWT_SECRET=tu-clave-secreta-super-segura-minimo-256-bits-para-hs256
 JWT_EXPIRATION=86400000
@@ -80,7 +92,20 @@ JWT_EXPIRATION=86400000
    - Obtén tu connection string
    - Reemplaza `MONGODB_URI` en el archivo `.env`
 
-3. **Generar JWT Secret**:
+3. **Instalar y configurar Redis** (ver [REDIS-SETUP.md](REDIS-SETUP.md)):
+   
+   **Opción rápida con Docker**:
+   ```bash
+   docker run -d --name redis-barbershop -p 6379:6379 redis:latest
+   ```
+   
+   **Verificar**:
+   ```bash
+   docker exec -it redis-barbershop redis-cli ping
+   # Respuesta esperada: PONG
+   ```
+
+4. **Generar JWT Secret**:
 ```bash
 # Genera una clave segura de 256 bits
 openssl rand -base64 32
@@ -146,6 +171,14 @@ http://localhost:8080/swagger-ui.html
 
 #### Barberos
 - `GET /api/v1/barberos` - Listar todos los barberos (público)
+
+#### Productos e Inventario
+- `POST /api/v1/productos/registro` - Registrar nuevo producto
+- `GET /api/v1/productos` - Listar todos los productos (con caché Redis)
+- `GET /api/v1/productos/{id}` - Obtener producto por ID
+- `POST /api/v1/productos/movimiento` - Registrar entrada/salida de inventario
+- `GET /api/v1/productos/stock-bajo` - Productos con stock bajo
+- `GET /api/v1/productos/reporte` - Reporte completo de inventario (con caché Redis)
 
 ### Autenticación en Swagger
 
@@ -357,6 +390,44 @@ Si tienes alguna pregunta o problema:
 - Verifica que tu rol tenga permisos para el endpoint
 
 ### Error: "Password validation failed"
+- La contraseña debe tener mínimo 8 caracteres
+- Debe contener al menos 1 mayúscula, 1 minúscula y 1 número
+
+### Error: "Connection to MongoDB failed"
+- Verifica que el `MONGODB_URI` en `.env` sea correcto
+- Asegúrate de tener conexión a Internet
+- Verifica que tu IP esté en la whitelist de MongoDB Atlas
+
+### Error: "Unable to connect to Redis"
+- Verifica que Redis esté corriendo: `docker ps | findstr redis`
+- Reinicia Redis: `docker restart redis-barbershop`
+- Consulta la [guía completa de Redis](REDIS-SETUP.md)
+
+---
+
+## 🔴 Redis Cache
+
+Este proyecto utiliza Redis para optimizar el rendimiento de consultas frecuentes:
+
+### Endpoints Cacheados:
+- `GET /productos` - Lista completa (TTL: 5 min)
+- `GET /productos/reporte` - Reporte de inventario (TTL: 5 min)
+
+### Invalidación Automática:
+El caché se limpia automáticamente al:
+- Registrar nuevos productos
+- Registrar movimientos de inventario (entrada/salida)
+
+### Instalación Rápida:
+```bash
+# Docker (recomendado)
+docker run -d --name redis-barbershop -p 6379:6379 redis:latest
+
+# Verificar
+docker exec -it redis-barbershop redis-cli ping
+```
+
+📖 **Guía completa**: Ver [REDIS-SETUP.md](REDIS-SETUP.md) para instalación detallada en Windows/Linux/macOS.
 - La contraseña debe tener mínimo 8 caracteres
 - Debe contener al menos 1 mayúscula, 1 minúscula y 1 número
 

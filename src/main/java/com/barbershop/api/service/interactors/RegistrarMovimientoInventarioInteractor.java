@@ -5,6 +5,7 @@ import com.barbershop.api.domain.repositories.ProductoRepository;
 import com.barbershop.api.service.dtos.MovimientoInventarioDTO;
 import com.barbershop.api.service.dtos.ProductoResponseDTO;
 import com.barbershop.api.service.exceptions.ProductoNoEncontradoException;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,12 +30,14 @@ public class RegistrarMovimientoInventarioInteractor {
 
     /**
      * Registra un movimiento de inventario (entrada o salida).
+     * Invalida el caché de productos y reportes.
      *
      * @param dto DTO con los datos del movimiento.
      * @return DTO de respuesta con el producto actualizado.
      * @throws ProductoNoEncontradoException si no se encuentra el producto.
      * @throws IllegalArgumentException      si el tipo de movimiento es inválido.
      */
+    @CacheEvict(value = { "productos", "reporteInventario" }, allEntries = true)
     public ProductoResponseDTO execute(final MovimientoInventarioDTO dto) {
         // Buscar el producto
         Producto producto = productoRepository
