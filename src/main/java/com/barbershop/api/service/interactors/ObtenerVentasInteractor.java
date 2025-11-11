@@ -7,6 +7,8 @@ import com.barbershop.api.service.dtos.ReporteVentasDTO;
 import com.barbershop.api.service.dtos.DetalleProductoResponseDTO;
 import com.barbershop.api.service.dtos.DetalleServicioResponseDTO;
 
+import com.barbershop.api.domain.entities.Venta;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +63,7 @@ public class ObtenerVentasInteractor {
         return reporte;
     }
 
-    private VentaResponseDTO toResponseDTO(com.barbershop.api.domain.entities.Venta venta) {
+    private VentaResponseDTO toResponseDTO(Venta venta) {
         var response = new VentaResponseDTO();
         response.setId(venta.getId());
         response.setFecha(venta.getFecha());
@@ -71,8 +73,11 @@ public class ObtenerVentasInteractor {
         if (venta.getBarbero() != null) {
             response.setBarberoId(venta.getBarbero().getDni());
             response.setBarberoNombre(venta.getBarbero().getNombre());
+        } else {
+            response.setBarberoId(null);
+            response.setBarberoNombre(null);
         }
-        
+            
         if (venta.getProductos() != null) {
             response.setProductos(venta.getProductos().stream()
                     .map(dp -> {

@@ -2,17 +2,26 @@ package com.barbershop.api.domain.entities;
 
 import com.barbershop.api.domain.value_objects.Email;
 import com.barbershop.api.domain.value_objects.Role;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import com.barbershop.api.domain.value_objects.Password;
 
 /**
  * La clase Usuario representa a un usuario en el sistema.
  * Contiene información básica como DNI, nombre, email, contraseña y rol.
  */
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
     /**
      * Identificador único del usuario.
      */
-    private final String dni;
+    private String dni;
     /**
      * Nombre del usuario.
      */

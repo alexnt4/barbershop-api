@@ -34,11 +34,7 @@ public class VentaRegistroInteractor {
 
     public VentaResponseDTO registrarVenta(VentaRegisterDTO ventaDTO) {
         try {
-            System.out.println("=== INICIANDO REGISTRO VENTA ===");
-            System.out.println("Cliente ID: " + ventaDTO.getClienteId());
-            System.out.println("Barbero ID: " + ventaDTO.getBarberoId());
-
-            // Obtener cliente (usuario con rol CLIENTE)
+            // Obtener cliente 
             var cliente = usuarioRepository.findByDni(ventaDTO.getClienteId())
                     .orElseThrow(() -> {
                         System.out.println("ERROR: Usuario cliente no encontrado: " + ventaDTO.getClienteId());
@@ -56,70 +52,76 @@ public class VentaRegistroInteractor {
             Usuario barbero = null;
             if (ventaDTO.getBarberoId() != null && !ventaDTO.getBarberoId().isEmpty()) {
                 barbero = usuarioRepository.findByDni(ventaDTO.getBarberoId())
-                        .orElseThrow(() -> {
-                            System.out.println("ERROR: Usuario barbero no encontrado: " + ventaDTO.getBarberoId());
-                            return new RuntimeException("Barbero no encontrado");
-                        });
+                        .orElseThrow(() -> new RuntimeException("Barbero no encontrado: " + ventaDTO.getBarberoId()));
                 
                 // Verificar que sea un barbero
                 if (!barbero.getRole().name().equals("BARBERO")) {
                     throw new RuntimeException("El usuario no es un barbero: " + ventaDTO.getBarberoId());
                 }
-                
                 System.out.println("Barbero encontrado: " + barbero.getNombre());
             }
 
             // Convertir y validar productos
-            System.out.println("Procesando productos...");
             var detallesProductos = ventaDTO.getProductos().stream()
                     .map(dto -> {
-                        System.out.println("Buscando producto ID: " + dto.getProductoId());
                         var producto = productoRepository.findById(dto.getProductoId())
                                 .orElseThrow(() -> {
-                                    System.out.println("ERROR: Producto no encontrado: " + dto.getProductoId());
                                     return new RuntimeException("Producto no encontrado: " + dto.getProductoId());
                                 });
-                        System.out.println("Producto encontrado: " + producto.getNombre() + ", Stock: " + producto.getCantidadDisponible() + "Precio unitario: " + producto.getPrecioUnitario());
 
                         // Validar stock
                         if (producto.getCantidadDisponible() < dto.getCantidad()) {
                             String errorMsg = "Stock insuficiente para: " + producto.getNombre() + 
                                     ". Disponible: " + producto.getCantidadDisponible() + 
                                     ", Solicitado: " + dto.getCantidad();
-                            System.out.println("ERROR: " + errorMsg);
                             throw new RuntimeException(errorMsg);
                         }
                         
                         // Actualizar stock
                         producto.registrarSalida(dto.getCantidad());
                         productoRepository.save(producto);
-                        System.out.println("Stock actualizado para: " + producto.getNombre() + ", Nuevo stock: " + producto.getCantidadDisponible());
                         
                         BigDecimal precioVenta = producto.getPrecioUnitario();
-                         System.out.println("PRECIO AUTOMÁTICO - Producto: " + producto.getNombre() + 
-                                         ", Precio: " + precioVenta + 
-                                         ", Cantidad: " + dto.getCantidad());
                         return new DetalleProducto(producto, dto.getCantidad(), precioVenta);
                     })
                     .collect(Collectors.toList());
 
             // Convertir servicios
-            System.out.println("Procesando servicios...");
             var detallesServicios = ventaDTO.getServicios() != null ? 
                 ventaDTO.getServicios().stream()
                     .map(dto -> {
-                        System.out.println("Buscando servicio ID: " + dto.getServicioId());
                         var servicio = servicioRepository.findById(dto.getServicioId())
                                 .orElseThrow(() -> {
-                                    System.out.println("ERROR: Servicio no encontrado: " + dto.getServicioId());
                                     return new RuntimeException("Servicio no encontrado: " + dto.getServicioId());
                                 });
-                        System.out.println("Servicio encontrado: " + servicio.getNombre() + ", Precio base: " + servicio.getPrecioBase());
-                        double precio = servicio.getPrecioBase();
-                        System.out.println("PRECIO AUTOMÁTICO - Servicio: " + servicio.getNombre() + 
-                                         ", Precio: " + precio);
+                        
+                        System.out.println("Servicio encontrado: " + servicio.getNombre() + 
+                                         ", Precio: " + servicio.getPrecio() + 
+                                         ", Duración: " + servicio.getDuracionMinutos() + "min" +
+                                         ", Barberos asignados: " + servicio.getBarberosIds());
+                        
+                        // VALIDACIÓN DEL BARBERO
+                        if (ventaDTO.getBarberoId() != null && !ventaDTO.getBarberoId().isEmpty() &&
+                            servicio.getBarberosIds() != null && !servicio.getBarberosIds().isEmpty()) {
+                            
+                            boolean barberoHabilitado = servicio.getBarberosIds().contains(ventaDTO.getBarberoId());
+                            if (!barberoHabilitado) {
+                                String errorMsg = "El barbero " + ventaDTO.getBarberoId() + 
+                                            " no está habilitado para realizar el servicio: " + 
+                                            servicio.getNombre();
+                                System.out.println("ERROR: " + errorMsg);
+                                throw new RuntimeException(errorMsg);
+                            }
+                            System.out.println("Barbero validado para el servicio: " + ventaDTO.getBarberoId());
+                        }
 
-                        return new DetalleServicio(servicio, precio, servicio.getDuracionEstimada());
+                        double precio = servicio.getPrecio();
+                        System.out.println("PRECIO AUTOMÁTICO - Servicio: " + servicio.getNombre() + 
+                                         ", Precio: " + precio + 
+                                         ", Duración: " + servicio.getDuracionMinutos() + "min");
+                        
+                        // CORREGIDO: Usa el constructor SIN barbero
+                        return new DetalleServicio(servicio, precio, servicio.getDuracionMinutos());
                     })
                     .collect(Collectors.toList()) : 
                 java.util.List.<DetalleServicio>of();
@@ -136,12 +138,12 @@ public class VentaRegistroInteractor {
             BigDecimal montoTotal = montoTotalProductos.add(montoTotalServicios);
             System.out.println("Monto total calculado: " + montoTotal);
 
-            // Crear venta - usa Usuario directamente
+            // Crear venta - SIN BARBERO
             var venta = new Venta(
                     null,
                     LocalDateTime.now(),
                     cliente,    // Usuario con rol CLIENTE
-                    barbero,    // Usuario con rol BARBERO (puede ser null)
+                    barbero,    // Usuario con rol BARBERO o null
                     detallesProductos,
                     detallesServicios,
                     montoTotal,
@@ -170,24 +172,28 @@ public class VentaRegistroInteractor {
         response.setClienteId(venta.getCliente().getDni());
         response.setClienteNombre(venta.getCliente().getNombre());
         
+        // asignar barbero
         if (venta.getBarbero() != null) {
-            response.setBarberoId(venta.getBarbero().getDni());
-            response.setBarberoNombre(venta.getBarbero().getNombre());
+        response.setBarberoId(venta.getBarbero().getDni());
+        response.setBarberoNombre(venta.getBarbero().getNombre());
+        } else {
+            response.setBarberoId(null);
+            response.setBarberoNombre(null);
         }
         
         // Convertir detalles de productos
         response.setProductos(venta.getProductos().stream()
-                .map(dp -> {
-                    var dto = new DetalleProductoResponseDTO();
-                    dto.setProductoId(dp.getProducto().getId());
-                    dto.setProductoNombre(dp.getProducto().getNombre());
-                    dto.setCantidad(dp.getCantidad());
-                    dto.setPrecioVenta(dp.getPrecioVenta());
-                    dto.setSubtotal(dp.getSubtotal());
-                    return dto;
-                })
-                .collect(Collectors.toList()));
-        
+            .map(dp -> {
+                var dto = new DetalleProductoResponseDTO();
+                dto.setProductoId(dp.getProducto().getId());
+                dto.setProductoNombre(dp.getProducto().getNombre());
+                dto.setCantidad(dp.getCantidad());
+                dto.setPrecioVenta(dp.getPrecioVenta());
+                dto.setSubtotal(dp.getSubtotal());
+                return dto;
+            })
+            .collect(Collectors.toList()));
+    
         // Convertir detalles de servicios
         response.setServicios(venta.getServicios().stream()
                 .map(ds -> {
@@ -196,7 +202,7 @@ public class VentaRegistroInteractor {
                     dto.setServicioNombre(ds.getServicio().getNombre());
                     dto.setPrecio(ds.getPrecio());
                     dto.setDuracion(ds.getDuracion());
-                    return dto;
+                    return dto;  
                 })
                 .collect(Collectors.toList()));
         

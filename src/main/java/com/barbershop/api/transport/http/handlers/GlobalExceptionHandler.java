@@ -1,13 +1,10 @@
 package com.barbershop.api.transport.http.handlers;
 
 import com.barbershop.api.service.exceptions.BarberoNoEncontradoException;
-<<<<<<< HEAD
+import com.barbershop.api.service.exceptions.ServicioInvalidoException;
+import com.barbershop.api.service.exceptions.UsuarioNoEncontradoException;
 import com.barbershop.api.service.exceptions.ProductoNoEncontradoException;
 import com.barbershop.api.service.exceptions.ProductoYaExisteException;
-=======
-import com.barbershop.api.service.exceptions.ServicioInvalidoException;
->>>>>>> feature/services
-import com.barbershop.api.service.exceptions.UsuarioNoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -43,22 +41,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
-<<<<<<< HEAD
      * Maneja excepciones cuando no se encuentra un producto.
      */
     @ExceptionHandler(ProductoNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleProductoNoEncontrado(final ProductoNoEncontradoException ex) {
-=======
-     * Maneja excepciones cuando no se encuentra un servicio.
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+        /* Maneja excepciones cuando no se encuentra un servicio.
      */
     @ExceptionHandler(ServicioInvalidoException.class)
     public ResponseEntity<Map<String, Object>> handleServicioNoEncontrado(final ServicioInvalidoException ex) {
->>>>>>> feature/services
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     /**
-<<<<<<< HEAD
      * Maneja excepciones cuando ya existe un producto con el mismo nombre.
      */
     @ExceptionHandler(ProductoYaExisteException.class)
@@ -73,10 +69,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(final IllegalArgumentException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    /**
+     * Maneja excepciones cuando no se encuentra una venta
+     */
+    @ExceptionHandler(com.barbershop.api.service.exceptions.VentaNoEncontradaException.class)
+    public ResponseEntity<Map<String, Object>> handleVentaNoEncontrada(final com.barbershop
+            .api.service.exceptions.VentaNoEncontradaException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
     /**
-=======
->>>>>>> feature/services
      * Maneja excepciones de acceso denegado (permisos).
      */
     @ExceptionHandler(AccessDeniedException.class)

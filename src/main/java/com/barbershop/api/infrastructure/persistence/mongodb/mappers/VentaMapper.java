@@ -7,6 +7,7 @@ import com.barbershop.api.domain.entities.Usuario;
 import com.barbershop.api.domain.entities.Venta;
 import com.barbershop.api.domain.entities.especializaciones.*;
 import com.barbershop.api.domain.repositories.UsuarioRepository;
+import com.barbershop.api.domain.value_objects.Role;
 import com.barbershop.api.infrastructure.persistence.mongodb.documents.*;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
@@ -48,19 +49,28 @@ public class VentaMapper {
         if (document == null) {
             return null;
         }
-
-        System.out.println("=== DEBUG VentaMapper.toDomain ===");
-        System.out.println("Venta ID: " + document.getId());
-        System.out.println("Productos en documento: " + (document.getProductos() != null ? document.getProductos().size() : "null"));
-        System.out.println("Servicios en documento: " + (document.getServicios() != null ? document.getServicios().size() : "null"));
-
+        
         Usuario cliente = usuarioRepository.findByDni(document.getClienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado: " + document.getClienteId()));
 
         Usuario barbero = null;
-        if (document.getBarberoId() != null) {
-            barbero = usuarioRepository.findByDni(document.getBarberoId())
-                    .orElse(null);
+        if (document.getBarberoId() != null && !document.getBarberoId().isEmpty()) {
+            try {
+                barbero = usuarioRepository.findByDni(document.getBarberoId())
+                        .orElse(null);
+                
+                // Si no se encuentra, crear un objeto básico con la info del documento
+                if (barbero == null) {
+                    System.out.println("ADVERTENCIA: Barbero no encontrado en BD, usando datos del documento");
+                    barbero = new Usuario();
+                    barbero.setDni(document.getBarberoId());
+                    barbero.setNombre(document.getBarberoNombre() != null ? document.getBarberoNombre() : "Barbero");
+                    // Puedes setear el rol si es necesario
+                    barbero.setRole(Role.BARBERO); // Asumiendo que tienes este enum
+                }
+            } catch (Exception e) {
+                System.out.println("Error buscando barbero: " + e.getMessage());
+            }
         }
 
         var detallesProductos = document.getProductos().stream()
@@ -71,8 +81,6 @@ public class VentaMapper {
                 .map(this::toDetalleServicioBasic)
                 .collect(Collectors.toList());
         
-        System.out.println("Detalles productos mapeados: " + detallesProductos.size());
-        System.out.println("Detalles servicios mapeados: " + detallesServicios.size());
 
         return new Venta(
             document.getId(),
@@ -102,12 +110,11 @@ public class VentaMapper {
             detalle.getServicio().getId(),
             detalle.getServicio().getNombre(),
             detalle.getPrecio(), 
-            detalle.getDuracion()
+            detalle.getDuracion() 
         );
     }
 
     private DetalleProducto toDetalleProductoBasic(final DetalleProductoDocument document) {
-        // Crear producto básico con BigDecimal
         Producto producto = new Producto(
             document.getProductoId(),
             document.getProductoNombre(),
@@ -124,14 +131,12 @@ public class VentaMapper {
     }
 
     private DetalleServicio toDetalleServicioBasic(final DetalleServicioDocument document) {
-        // Crear servicio básico
-        Servicio servicio = new Servicio(
-            document.getServicioId(),
-            document.getServicioNombre(),
-            "", // descripción
-            document.getPrecio(), // precio base
-            0 // duración estimada (podrías guardarla si quieres)
-        );
-        return new DetalleServicio(servicio, document.getPrecio(), document.getDuracion());
+        Servicio servicio = new Servicio();
+        servicio.setId(document.getServicioId());
+        servicio.setNombre(document.getServicioNombre());
+        servicio.setPrecio(document.getPrecio());
+        servicio.setDuracionMinutos(document.getDuracion());
+    
+    return new DetalleServicio(servicio, document.getPrecio(), document.getDuracion());
     }
 }
