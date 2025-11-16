@@ -45,9 +45,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ProductoNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleProductoNoEncontrado(final ProductoNoEncontradoException ex) {
-         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
-    /*
+
+    /**
      * Maneja excepciones cuando no se encuentra un servicio.
      */
     @ExceptionHandler(ServicioInvalidoException.class)
