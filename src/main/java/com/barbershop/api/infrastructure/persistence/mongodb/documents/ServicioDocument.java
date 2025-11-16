@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServicioDocument {
-
     @Id
     private String id;
     private String nombre;
