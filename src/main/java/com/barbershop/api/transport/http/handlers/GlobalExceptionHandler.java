@@ -5,10 +5,6 @@ import com.barbershop.api.service.exceptions.ServicioInvalidoException;
 import com.barbershop.api.service.exceptions.UsuarioNoEncontradoException;
 import com.barbershop.api.service.exceptions.ProductoNoEncontradoException;
 import com.barbershop.api.service.exceptions.ProductoYaExisteException;
-=========
-import com.barbershop.api.service.exceptions.ServicioInvalidoException;
->>>>>>>>> Temporary merge branch 2
-import com.barbershop.api.service.exceptions.UsuarioNoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -49,7 +45,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ProductoNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> handleProductoNoEncontrado(final ProductoNoEncontradoException ex) {
-=========
+         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    /*
      * Maneja excepciones cuando no se encuentra un servicio.
      */
     @ExceptionHandler(ServicioInvalidoException.class)
@@ -74,8 +72,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-=========
->>>>>>>>> Temporary merge branch 2
+
      * Maneja excepciones de acceso denegado (permisos).
      */
     @ExceptionHandler(AccessDeniedException.class)

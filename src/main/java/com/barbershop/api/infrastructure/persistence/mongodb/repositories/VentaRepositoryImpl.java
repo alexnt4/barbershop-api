@@ -25,20 +25,20 @@ public class VentaRepositoryImpl implements VentaRepository {
     public Venta save(final Venta venta) {
         final var document = mapper.toDocument(venta);
         final var saved = springRepository.save(document);
-        return mapper.toDomain(saved); // Sin parámetros extra
+        return mapper.toDomain(saved); 
     }
 
     @Override
     public Optional<Venta> findById(final String id) {
         return springRepository.findById(id)
-                .map(mapper::toDomain); // Sin parámetros extra
+                .map(mapper::toDomain); 
     }
 
     @Override
     public List<Venta> findByClienteId(final String clienteId) {
         return springRepository.findByClienteId(clienteId)
                 .stream()
-                .map(mapper::toDomain) // Sin parámetros extra
+                .map(mapper::toDomain) 
                 .collect(java.util.stream.Collectors.toList());
     }
 
@@ -46,7 +46,7 @@ public class VentaRepositoryImpl implements VentaRepository {
     public List<Venta> findByBarberoId(final String barberoId) {
         return springRepository.findByBarberoId(barberoId)
                 .stream()
-                .map(mapper::toDomain) // Sin parámetros extra
+                .map(mapper::toDomain) 
                 .collect(java.util.stream.Collectors.toList());
     }
 
@@ -54,7 +54,7 @@ public class VentaRepositoryImpl implements VentaRepository {
     public List<Venta> findByFechaBetween(final LocalDateTime inicio, final LocalDateTime fin) {
         return springRepository.findByFechaBetween(inicio, fin)
                 .stream()
-                .map(mapper::toDomain) // Sin parámetros extra
+                .map(mapper::toDomain) 
                 .collect(java.util.stream.Collectors.toList());
     }
 
@@ -62,7 +62,7 @@ public class VentaRepositoryImpl implements VentaRepository {
     public List<Venta> findAll() {
         return springRepository.findAll()
                 .stream()
-                .map(mapper::toDomain) // Sin parámetros extra
+                .map(mapper::toDomain) 
                 .collect(java.util.stream.Collectors.toList());
     }
 

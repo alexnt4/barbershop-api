@@ -21,7 +21,7 @@ public class Venta {
     private Usuario barbero;
     private List<DetalleProducto> productos;
     private List<DetalleServicio> servicios;
-    private BigDecimal montoTotal; // Cambiado a BigDecimal
+    private BigDecimal montoTotal; 
     private String metodoPago;
     private String estado;
 

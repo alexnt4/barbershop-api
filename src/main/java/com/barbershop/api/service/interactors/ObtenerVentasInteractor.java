@@ -91,7 +91,7 @@ public class ObtenerVentasInteractor {
                     })
                     .collect(Collectors.toList()));
         } else {
-            response.setProductos(new ArrayList<>()); // Lista vacía en lugar de null
+            response.setProductos(new ArrayList<>()); 
         }
         
         if (venta.getServicios() != null) {
@@ -106,7 +106,7 @@ public class ObtenerVentasInteractor {
                     })
                     .collect(Collectors.toList()));
         } else {
-            response.setServicios(new ArrayList<>()); // Lista vacía en lugar de null
+            response.setServicios(new ArrayList<>()); 
         }
         
         response.setMontoTotal(venta.getMontoTotal());

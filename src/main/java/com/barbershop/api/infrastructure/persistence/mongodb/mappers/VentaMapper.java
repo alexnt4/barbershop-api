@@ -59,14 +59,12 @@ public class VentaMapper {
                 barbero = usuarioRepository.findByDni(document.getBarberoId())
                         .orElse(null);
                 
-                // Si no se encuentra, crear un objeto básico con la info del documento
                 if (barbero == null) {
                     System.out.println("ADVERTENCIA: Barbero no encontrado en BD, usando datos del documento");
                     barbero = new Usuario();
                     barbero.setDni(document.getBarberoId());
                     barbero.setNombre(document.getBarberoNombre() != null ? document.getBarberoNombre() : "Barbero");
-                    // Puedes setear el rol si es necesario
-                    barbero.setRole(Role.BARBERO); // Asumiendo que tienes este enum
+                    barbero.setRole(Role.BARBERO); 
                 }
             } catch (Exception e) {
                 System.out.println("Error buscando barbero: " + e.getMessage());
@@ -121,7 +119,7 @@ public class VentaMapper {
             "", 
             0, 
             BigDecimal.valueOf(document.getPrecioVenta()), 
-            null // fechaActualizacion
+            null 
         );
         return new DetalleProducto(
             producto, 

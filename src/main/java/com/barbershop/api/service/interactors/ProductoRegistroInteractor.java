@@ -46,17 +46,16 @@ public class ProductoRegistroInteractor {
                             + dto.getNombre());
         }
 
-        // Crear la entidad de dominio
+        
         Producto producto = new Producto(
                 dto.getNombre(),
                 dto.getProveedor(),
                 dto.getCantidadDisponible(),
                 dto.getPrecioUnitario());
 
-        // Guardar en el repositorio
+       
         Producto productoGuardado = productoRepository.save(producto);
 
-        // Convertir a DTO de respuesta
         return new ProductoResponseDTO(
                 productoGuardado.getId(),
                 productoGuardado.getNombre(),

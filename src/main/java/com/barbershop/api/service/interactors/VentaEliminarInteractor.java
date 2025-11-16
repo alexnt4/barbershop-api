@@ -13,7 +13,7 @@ public class VentaEliminarInteractor {
     }
 
     public void ejecutar(String ventaId) {
-        // Verificar si la venta existe antes de eliminar
+       
         if (!ventaRepository.findById(ventaId).isPresent()) {
             throw new RuntimeException("Venta no encontrada con ID: " + ventaId);
         }
