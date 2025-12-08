@@ -37,7 +37,7 @@ public class ObtenerTurnosPorDiaInteractor {
         return filter;
     }
 
-  //  @Cacheable(value = "turnosHoy", key = "'hoy'")
+    @Cacheable(value = "turnosHoy", key = "'hoy'")
     public List<Turno> ejecutar() {
         LocalDate hoy = LocalDate.now();
         LocalDateTime inicioDelDia = hoy.atStartOfDay(); 

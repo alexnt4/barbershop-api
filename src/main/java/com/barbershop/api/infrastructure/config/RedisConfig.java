@@ -16,6 +16,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * Configuración de Redis para caché.
@@ -102,8 +104,17 @@ public class RedisConfig {
                                 .fromSerializer(jsonSerializer))
                 .disableCachingNullValues(); // No cachear valores null
 
+        // Configuración específica para "turnosHoy" con TTL hasta fin del día
+        Duration untilEndOfDay = Duration.between(LocalDateTime.now(), LocalDateTime.now().toLocalDate().atTime(LocalTime.MAX));
+        RedisCacheConfiguration turnosHoyConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(untilEndOfDay)
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer))
+                .disableCachingNullValues();
+
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(config)
+                .withCacheConfiguration("turnosHoy", turnosHoyConfig)
                 .build();
     }
 }
