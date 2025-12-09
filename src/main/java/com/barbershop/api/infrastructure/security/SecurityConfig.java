@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/usuarios/registro").permitAll()
                         .requestMatchers("/api/v1/barberos").permitAll()
                         .requestMatchers("/api/v1/barberos/registro").permitAll()
+                        .requestMatchers("/api/v1/reportes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/servicios", "/api/v1/servicios/**").permitAll()
                         // Swagger/OpenAPI públicos (todas las variantes)
                         .requestMatchers(
