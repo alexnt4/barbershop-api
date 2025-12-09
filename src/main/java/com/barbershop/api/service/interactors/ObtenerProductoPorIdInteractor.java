@@ -41,10 +41,12 @@ public class ObtenerProductoPorIdInteractor {
         return new ProductoResponseDTO(
                 producto.getId(),
                 producto.getNombre(),
-                producto.getProveedor(),
+                producto.getProveedor(), 
                 producto.getCantidadDisponible(),
-                producto.getPrecioUnitario(),
+                producto.getPrecioUnitario(), 
                 producto.calcularValorInventario(),
-                producto.getFechaActualizacion());
+                producto.getFechaActualizacion(),
+                producto.getProveedorId()     
+        );
     }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -23,7 +24,7 @@ public class Proveedor {
     private String email;
     private String condicionesEntrega;
     private String metodoPago;
-    private Double precioCompra;
+    private BigDecimal precioCompra;
 
     // Relación con el producto asociado
     private String productoId;

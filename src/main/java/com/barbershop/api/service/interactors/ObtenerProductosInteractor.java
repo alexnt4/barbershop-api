@@ -57,6 +57,7 @@ public class ObtenerProductosInteractor {
                 producto.getCantidadDisponible(),
                 producto.getPrecioUnitario(),
                 producto.calcularValorInventario(),
-                producto.getFechaActualizacion());
+                producto.getFechaActualizacion(),
+                producto.getProveedorId());
     }
 }

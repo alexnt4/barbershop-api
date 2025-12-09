@@ -1,7 +1,6 @@
 package com.barbershop.api.service.interactors;
 
 import com.barbershop.api.domain.entities.Proveedor;
-import com.barbershop.api.domain.entities.Producto;
 import com.barbershop.api.domain.repositories.ProveedorRepository;
 import com.barbershop.api.domain.repositories.ProductoRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,23 +33,26 @@ public class ProveedorInteractor {
     public Proveedor actualizarProveedor(String id, Proveedor proveedorActualizado) {
         return proveedorRepository.findById(id)
                 .map(proveedor -> {
+                    // Actualizamos datos básicos
                     proveedor.setNombre(proveedorActualizado.getNombre());
                     proveedor.setContacto(proveedorActualizado.getContacto());
                     proveedor.setTelefono(proveedorActualizado.getTelefono());
                     proveedor.setEmail(proveedorActualizado.getEmail());
                     proveedor.setCondicionesEntrega(proveedorActualizado.getCondicionesEntrega());
                     proveedor.setMetodoPago(proveedorActualizado.getMetodoPago());
+                    
+                    // Actualizamos datos críticos de negocio
                     proveedor.setPrecioCompra(proveedorActualizado.getPrecioCompra());
                     proveedor.setProductoId(proveedorActualizado.getProductoId());
 
                     Proveedor actualizado = proveedorRepository.save(proveedor);
 
-                    // Si hay producto vinculado, sincronizar precio automáticamente
+                    // Sincronización automática: Si cambia el precio o el producto, actualizamos el inventario
                     actualizarPrecioEnProducto(actualizado);
 
                     return actualizado;
                 })
-                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado")); // Idealmente usar una excepción personalizada
     }
 
     public void eliminarProveedor(String id) {
@@ -63,7 +65,15 @@ public class ProveedorInteractor {
     private void actualizarPrecioEnProducto(Proveedor proveedor) {
         if (proveedor.getProductoId() != null) {
             productoRepository.findById(proveedor.getProductoId()).ifPresent(producto -> {
-                //producto.setPurchasePrice(proveedor.getPrecioCompra());
+                // 1. Actualizamos el precio de compra (Costo)
+                producto.setPrecioCompra(proveedor.getPrecioCompra());
+                
+                // 2. Vinculamos el ID del proveedor al producto (Asociación Real)
+                producto.setProveedorId(proveedor.getId());
+                
+                // 3. Actualizamos el nombre del proveedor en el producto (para facilitar lecturas sin hacer join)
+                producto.setProveedor(proveedor.getNombre());
+
                 productoRepository.save(producto);
             });
         }

@@ -40,6 +40,18 @@ public class Producto {
     private LocalDateTime fechaActualizacion;
 
     /**
+     * Precio al que se compra el producto al proveedor (Costo).
+     */
+    private BigDecimal precioCompra;
+
+    /**
+     * ID del proveedor asociado (Referencia a la colección Proveedor).
+     */
+    private String proveedorId;
+
+    
+
+    /**
      * Constructor completo de la clase Producto.
      *
      * @param idParam                 Identificador único del producto.
@@ -193,5 +205,21 @@ public class Producto {
 
     public void setFechaActualizacion(final LocalDateTime fechaParam) {
         this.fechaActualizacion = fechaParam;
+    }
+
+    public BigDecimal getPrecioCompra() {
+        return precioCompra;
+    }
+
+    public void setPrecioCompra(BigDecimal precioCompra) {
+        this.precioCompra = precioCompra;
+    }
+
+    public String getProveedorId() {
+        return proveedorId;
+    }
+
+    public void setProveedorId(String proveedorId) {
+        this.proveedorId = proveedorId;
     }
 }
