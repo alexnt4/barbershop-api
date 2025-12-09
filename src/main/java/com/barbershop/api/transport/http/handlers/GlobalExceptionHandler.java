@@ -48,7 +48,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    /**
+    
+     /**
      * Maneja excepciones cuando no se encuentra un servicio.
      */
     @ExceptionHandler(ServicioInvalidoException.class)

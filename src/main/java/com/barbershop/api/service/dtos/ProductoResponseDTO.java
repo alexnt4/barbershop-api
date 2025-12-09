@@ -44,6 +44,16 @@ public class ProductoResponseDTO {
     private LocalDateTime fechaActualizacion;
 
     /**
+     * Precio de compra del producto (nuevo campo).
+     */
+    private BigDecimal precioCompra;
+
+    /**
+     * ID del proveedor asociado (nuevo campo).
+     */
+    private String proveedorId;
+
+    /**
      * Constructor vacío.
      */
     public ProductoResponseDTO() {
@@ -61,20 +71,23 @@ public class ProductoResponseDTO {
      * @param fechaActualizacionParam Fecha de actualización.
      */
     public ProductoResponseDTO(final String idParam,
-            final String nombreParam,
-            final String proveedorParam,
-            final Integer cantidadDisponibleParam,
-            final BigDecimal precioUnitarioParam,
-            final BigDecimal valorInventarioParam,
-            final LocalDateTime fechaActualizacionParam) {
-        this.id = idParam;
-        this.nombre = nombreParam;
-        this.proveedor = proveedorParam;
-        this.cantidadDisponible = cantidadDisponibleParam;
-        this.precioUnitario = precioUnitarioParam;
-        this.valorInventario = valorInventarioParam;
-        this.fechaActualizacion = fechaActualizacionParam;
-    }
+        final String nombreParam,
+        final String proveedorParam,
+        final Integer cantidadDisponibleParam,
+        final BigDecimal precioUnitarioParam,
+        final BigDecimal valorInventarioParam,
+        final LocalDateTime fechaActualizacionParam,
+        final String proveedorIdParam) {
+    
+    this.id = idParam;  
+    this.nombre = nombreParam;
+    this.proveedor = proveedorParam;
+    this.cantidadDisponible = cantidadDisponibleParam;
+    this.precioUnitario = precioUnitarioParam;
+    this.valorInventario = valorInventarioParam;
+    this.fechaActualizacion = fechaActualizacionParam;
+    this.proveedorId = proveedorIdParam;
+}
 
     // Getters y Setters
     public String getId() {
@@ -131,5 +144,21 @@ public class ProductoResponseDTO {
 
     public void setFechaActualizacion(final LocalDateTime fechaParam) {
         this.fechaActualizacion = fechaParam;
+    }
+
+    public BigDecimal getPrecioCompra() {
+        return precioCompra;
+    }
+
+    public void setPrecioCompra(final BigDecimal precioCompraParam) {
+        this.precioCompra = precioCompraParam;
+    }
+
+    public String getProveedorId() {
+        return proveedorId;
+    }
+
+    public void setProveedorId(final String proveedorIdParam) {
+        this.proveedorId = proveedorIdParam;
     }
 }

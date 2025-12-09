@@ -69,6 +69,8 @@ public class RegistrarMovimientoInventarioInteractor {
                 productoActualizado.getCantidadDisponible(),
                 productoActualizado.getPrecioUnitario(),
                 productoActualizado.calcularValorInventario(),
-                productoActualizado.getFechaActualizacion());
+                productoActualizado.getFechaActualizacion(),
+                productoActualizado.getProveedorId()
+        )   ;
     }
 }

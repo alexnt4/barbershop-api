@@ -63,6 +63,7 @@ public class ProductoRegistroInteractor {
                 productoGuardado.getCantidadDisponible(),
                 productoGuardado.getPrecioUnitario(),
                 productoGuardado.calcularValorInventario(),
-                productoGuardado.getFechaActualizacion());
+                productoGuardado.getFechaActualizacion(),
+                productoGuardado.getProveedorId());
     }
 }

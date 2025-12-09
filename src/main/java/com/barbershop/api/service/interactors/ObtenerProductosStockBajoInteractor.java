@@ -69,6 +69,7 @@ public class ObtenerProductosStockBajoInteractor {
                 producto.getCantidadDisponible(),
                 producto.getPrecioUnitario(),
                 producto.calcularValorInventario(),
-                producto.getFechaActualizacion());
+                producto.getFechaActualizacion(),
+                producto.getProveedorId());
     }
 }
