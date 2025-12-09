@@ -44,4 +44,5 @@ public class Servicio {
      * Lista de IDs de barberos que ofrecen el servicio.
      */
     private List<String> barberosIds;
+
 }
